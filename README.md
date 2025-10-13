@@ -19,3 +19,6 @@
 ## 🧩 Приклад візуалізації
 ![weather-crime-chicago](dashboard/weather_crime.png)
 
+## 👨‍💻 Автор
+**[Andrii Lohinov]** — Junior Data Analyst  
+📧 [www.linkedin.com/in/andrii-lohinov]
