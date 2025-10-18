@@ -12,7 +12,7 @@
 ## 📦 Дані
 - **Злочини**: Chicago Data Portal — *Crimes - 2001 to Present*
 - **Погода**: Open-Meteo / VisualCrossing (історичні погодні дані)
-- **Одиниці вимірювання**: температура — °C, тиск — hPa (`sealevelpressure`)
+- **Одиниці вимірювання**: температура — °C
 
 👉 [Переглянути дашборд у Looker Studio](https://lookerstudio.google.com/reporting/779d1576-7a6d-4495-b8f4-50f122653d1d)
 
