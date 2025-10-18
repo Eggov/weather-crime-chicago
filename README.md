@@ -1,6 +1,6 @@
-# Weather & Crime in Chicago (2022–2023)
+# Weather & Crime in Chicago (2022)
 
-Аналіз впливу погодних факторів (температура, опади, тиск) на частоту, характер і локації злочинів у Чикаго.  
+Аналіз впливу погодних факторів (температура, опади) на частоту, характер злочинів у Чикаго.  
 Стек: **BigQuery + SQL + Looker Studio**.
 
 ## ⚙️ Використані інструменти
@@ -14,7 +14,7 @@
 - **Погода**: Open-Meteo / VisualCrossing (історичні погодні дані)
 - **Одиниці вимірювання**: температура — °C, тиск — hPa (`sealevelpressure`)
 
-👉 [Переглянути дашборд у Looker Studio](https://lookerstudio.google.com/reporting/50b8e41e-c390-4309-a9b6-e05841b6a646)
+👉 [Переглянути дашборд у Looker Studio](https://lookerstudio.google.com/reporting/779d1576-7a6d-4495-b8f4-50f122653d1d)
 
 ## 🧩 Приклад візуалізації
 ![weather-crime-chicago](dashboard/temp.PNG)
