@@ -1,69 +1,51 @@
--- 1) Температура vs кількість злочинів по днях
-CREATE OR REPLACE VIEW `pet-project-weather-crime.weather_chicago_2022_23.temp_vs_crimes` AS
-SELECT 
-  w.datetime AS date,
-  w.temp,
-  COUNT(c.primary_type) AS total_crimes
-FROM `pet-project-weather-crime.weather_chicago_2022_23.chicago` AS w
-LEFT JOIN `pet-project-weather-crime.weather_chicago_2022_23.crimes` AS c
-  ON DATE(c.date) = w.datetime
-GROUP BY w.datetime, w.temp
-ORDER BY w.datetime;
+WITH
+cte_weather AS (
+  SELECT
+    timestamp(w.datetime)                         AS date,               
+    ((w.temp - 32) * 5.0 / 9.0)           AS temp_c,
+    w.precip                                 AS precip_amount,      
+    COALESCE(w.preciptype, 'None')           AS precip_type,        
+    w.sealevelpressure                       AS pres                
+  FROM `pet-project-weather-crime.weather_chicago_2022_23.chicago` AS w
+),
 
--- 2) Типи злочинів за діапазонами температур
-CREATE OR REPLACE VIEW `pet-project-weather-crime.weather_chicago_2022_23.crimes_by_temp_range` AS
-SELECT 
+cte_crimes AS (
+  SELECT
+    c.date                                    AS date,              
+    c.primary_type                            AS primary_type,
+    c.location_description                    AS loc_disc,
+    c.Latitude                                AS loc_lat,
+    c.Longitude                               AS loc_long,
+    COUNT(*)                                  AS total_crimes
+  FROM `pet-project-weather-crime.weather_chicago_2022_23.crimes` AS c
+  GROUP BY date, primary_type, loc_disc, loc_lat, loc_long
+)
+
+SELECT
+  c.date,
+  w.temp_c,
+  w.precip_amount,
+  w.precip_type,
+  w.pres,
+  c.total_crimes,
+  c.primary_type,
+  c.loc_lat,
+  c.loc_long,
+  c.loc_disc,
   CASE 
-    WHEN w.temp < 0 THEN 'Cold (< 0°C)'
-    WHEN w.temp BETWEEN 0 AND 10 THEN 'Cool (0-10°C)'
-    WHEN w.temp BETWEEN 10 AND 20 THEN 'Mild (10-20°C)'
-    WHEN w.temp BETWEEN 20 AND 30 THEN 'Warm (20-30°C)'
+    WHEN w.temp_c < 0            THEN 'Cold (< 0°C)'
+    WHEN w.temp_c BETWEEN 0 AND 10  THEN 'Cool (0-10°C)'
+    WHEN w.temp_c BETWEEN 10 AND 20 THEN 'Mild (10-20°C)'
+    WHEN w.temp_c BETWEEN 20 AND 30 THEN 'Warm (20-30°C)'
     ELSE 'Hot (>30°C)'
   END AS temp_range,
-  c.primary_type,
-  COUNT(*) AS crime_count
-FROM `pet-project-weather-crime.weather_chicago_2022_23.chicago` AS w
-JOIN `pet-project-weather-crime.weather_chicago_2022_23.crimes` AS c
-  ON DATE(c.date) = w.datetime
-GROUP BY temp_range, c.primary_type
-ORDER BY crime_count DESC;
-
--- 3) Опади vs типи злочинів
-CREATE OR REPLACE VIEW `pet-project-weather-crime.weather_chicago_2022_23.crimes_by_precip` AS
-SELECT 
-  COALESCE(w.preciptype, 'None') AS precipitation_type,
-  c.primary_type,
-  COUNT(*) AS crime_count
-FROM `pet-project-weather-crime.weather_chicago_2022_23.chicago` AS w
-JOIN `pet-project-weather-crime.weather_chicago_2022_23.crimes` AS c
-  ON DATE(c.date) = w.datetime
-GROUP BY precipitation_type, c.primary_type
-ORDER BY crime_count DESC;
-
--- 4) Тиск (приведений до рівня моря) vs кількість злочинів
-CREATE OR REPLACE VIEW `pet-project-weather-crime.weather_chicago_2022_23.sealevelpressure_vs_crimes` AS
-SELECT 
-  w.datetime,
-  w.sealevelpressure,
-  COUNT(c.primary_type) AS total_crimes
-FROM `pet-project-weather-crime.weather_chicago_2022_23.chicago` AS w
-LEFT JOIN `pet-project-weather-crime.weather_chicago_2022_23.crimes` AS c
-  ON DATE(c.date) = w.datetime
-GROUP BY w.datetime, w.sealevelpressure
-ORDER BY w.datetime;
-
--- 5) Локації злочинів при жарі/дощі/нормі
-CREATE OR REPLACE VIEW `pet-project-weather-crime.weather_chicago_2022_23.crimes_by_weather_condition` AS
-SELECT 
-  c.location_description,
   CASE 
-    WHEN w.temp >= 25 THEN 'Hot'
-    WHEN w.precip > 0 THEN 'Rainy'
+    WHEN w.temp_c >= 25          THEN 'Hot'
+    WHEN w.precip_amount > 0     THEN 'Rainy'
     ELSE 'Normal'
-  END AS weather_condition,
-  COUNT(*) AS crime_count
-FROM `pet-project-weather-crime.weather_chicago_2022_23.chicago` AS w
-JOIN `pet-project-weather-crime.weather_chicago_2022_23.crimes` AS c
-  ON DATE(c.date) = w.datetime
-GROUP BY c.location_description, weather_condition
-ORDER BY crime_count DESC;
+  END AS weather_condition
+FROM cte_crimes c
+inner join cte_weather w
+USING (date)                        
+ORDER BY w.date
+limit 10
