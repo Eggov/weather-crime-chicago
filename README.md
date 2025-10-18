@@ -17,7 +17,7 @@
 👉 [Переглянути дашборд у Looker Studio](https://lookerstudio.google.com/reporting/779d1576-7a6d-4495-b8f4-50f122653d1d)
 
 ## 🧩 Приклад візуалізації
-![weather-crime-chicago](dashboard/temp.PNG)
+![weather-crime-chicago](dashboard/temp.png)
 
 ## 👨‍💻 Автор
 **[Andrii Lohinov]** — Junior Data Analyst  
